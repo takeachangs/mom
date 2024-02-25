@@ -1,12 +1,15 @@
 from pymongo.mongo_client import MongoClient
 
+db_name = "user_data"
+col_name = "chat_history"
+
 
 """Return the collection containing chat history. This is a helper
 function.
 """
 def find_db(client: MongoClient, user: str) -> dict:
-    db = client["user_data"]
-    return db["chat_history"]
+    db = client[db_name]
+    return db[col_name]
 
 
 """Return true iff this user already has a document in the chat history
@@ -25,7 +28,7 @@ def init_chat_history(client: MongoClient, user: str) -> bool:
         return False
 
     col = find_db(client, user)
-    new_doc = {"user": user, "chat_history": []}
+    new_doc = {"user": user, col_name: []}
     col.insert_one(new_doc)
 
     return True
@@ -41,7 +44,7 @@ def get_chat_history(client: MongoClient, user: str) -> list:
 
     col = find_db(client, user)
     doc = col.find_one({"user": user})
-    return doc["chat_history"]
+    return doc[col_name]
 
 
 """Add to the chat history of this user. Return false iff this user
@@ -54,14 +57,14 @@ def record_chat_history(client: MongoClient, user: str, chat_history: \
     
     query = {"user": user}
 
-    db = client["user_data"]
-    col = db["chat_history"]
+    db = client[db_name]
+    col = db[col_name]
     doc = col.find_one(query)
 
-    new_history = doc["chat_history"]
+    new_history = doc[col_name]
     new_history.extend(chat_history)
 
-    col.update_one(query, {"chat_history": new_history})
+    col.update_one(query, {col_name: new_history})
 
     return True
 
@@ -75,9 +78,9 @@ def clear_chat_history(client: MongoClient, user: str) -> bool:
 
     query = {"user": user}
 
-    db = client["user_data"]
-    col = db["chat_history"]
+    db = client[db_name]
+    col = db[col_name]
 
-    col.update_one(query, {"chat_history": []})
+    col.update_one(query, {col_name: []})
 
     return True
