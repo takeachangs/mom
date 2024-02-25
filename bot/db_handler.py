@@ -5,7 +5,6 @@ from pymongo.mongo_client import MongoClient
 function.
 """
 def find_db(client: MongoClient, user: str) -> dict:
-    query = {"user": user}
     db = client["user_data"]
     return db["chat_history"]
 
@@ -15,7 +14,7 @@ collection.
 """
 def find_chat_history(client: MongoClient, user: str) -> bool:
     col = find_db(client, user)
-    return col.find_one(query) != None
+    return col.find_one({"user": user}) != None
 
 
 """Create a new document for this user in the chat history collection.
@@ -41,7 +40,7 @@ def get_chat_history(client: MongoClient, user: str) -> list:
         return []
 
     col = find_db(client, user)
-    doc = col.find_one(query)
+    doc = col.find_one({"user": user})
     return doc["chat_history"]
 
 
@@ -70,7 +69,7 @@ def record_chat_history(client: MongoClient, user: str, chat_history: \
 """Clear the chat history of this user. Return false iff this user
 does not have a document in the chat history collection.
 """
-def clear_chat_history(client: MongoClient, user: str):
+def clear_chat_history(client: MongoClient, user: str) -> bool:
     if find_chat_history(client, user) == True:
         return False
 
