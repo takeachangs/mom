@@ -47,13 +47,12 @@ def get_chat_history(client: MongoClient, user: str) -> list:
     return doc[col_name]
 
 
-"""Add to the chat history of this user. Return false iff this user
-does not have a document in the chat history collection.
+"""Add to the chat history of this user.
 """
 def record_chat_history(client: MongoClient, user: str, chat_history: \
                         list) -> bool:
-    if find_chat_history(client, user) == True:
-        return False
+    if find_chat_history(client, user) != True:
+        init_chat_history(client, user)
     
     query = {"user": user}
 
