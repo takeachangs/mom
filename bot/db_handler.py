@@ -7,7 +7,7 @@ col_name = "chat_history"
 """Return the collection containing chat history. This is a helper
 function.
 """
-def find_db(client: MongoClient, user: str) -> dict:
+def _find_db(client: MongoClient, user: str) -> dict:
     db = client[db_name]
     return db[col_name]
 
@@ -16,7 +16,7 @@ def find_db(client: MongoClient, user: str) -> dict:
 collection.
 """
 def find_chat_history(client: MongoClient, user: str) -> bool:
-    col = find_db(client, user)
+    col = _find_db(client, user)
     return col.find_one({"user": user}) != None
 
 
@@ -27,7 +27,7 @@ def init_chat_history(client: MongoClient, user: str) -> bool:
     if find_chat_history(client, user) == True:
         return False
 
-    col = find_db(client, user)
+    col = _find_db(client, user)
     new_doc = {"user": user, col_name: []}
     col.insert_one(new_doc)
 
@@ -42,7 +42,7 @@ def get_chat_history(client: MongoClient, user: str) -> list:
     if find_chat_history(client, user) == False:
         return []
 
-    col = find_db(client, user)
+    col = _find_db(client, user)
     doc = col.find_one({"user": user})
     return doc[col_name]
 
