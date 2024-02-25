@@ -7,7 +7,7 @@ class CohereGenerate:
         """
         Initialize Cohere client
         """
-        self.co = cohere.Client("6yJnofp1XcVL54HTVCh19zBlXnGLuDm9GdAqyQJi")
+        self.co = cohere.Client("") # Replace string with your own key
         self.model = "command"
         self.temperature = 0
         
