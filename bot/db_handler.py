@@ -1,85 +1,121 @@
 from pymongo.mongo_client import MongoClient
-
+from pymongo.collection import Collection
+from pymongo.database import Database
+from utils.helpers import format_entry
 db_name = "user_data"
-col_name = "chat_history"
+collection_id = "_id"
+chat_history_column = "chat_history"
+user_name_column = "user_name"
 
-
+# {
+#  _id: "..."
+#  user_name: "..."
+#  chat_history: "<Cohere format>"
+# }
 """Return the collection containing chat history. This is a helper
 function.
 """
-def _find_db(client: MongoClient, user: str) -> dict:
-    db = client[db_name]
-    return db[col_name]
+def _find_db(client: MongoClient) -> dict:
+    db: Database = client[db_name]
+    return db
 
 
-"""Return true iff this user already has a document in the chat history
-collection.
+"""Return true iff this user exists in the user collection
 """
-def find_chat_history(client: MongoClient, user: str) -> bool:
-    col = _find_db(client, user)
-    return col.find_one({"user": user}) != None
+def find_user(client: MongoClient,
+              user_id: str) -> (dict | None):
+    db: Database = _find_db(client)
+    ids: Collection = db[collection_id]
+    query: dict = {collection_id: user_id}
 
+    # print_all_users(client)
 
-"""Create a new document for this user in the chat history collection.
-Do nothing and return false iff this user already has a document.
+    user = ids.find_one(query)
+    print(f"\n{user}\n")
+    return user
+
+"""Logs all users in the collection to the console"""
+def print_all_users(client: MongoClient):
+    db: Database = _find_db(client)
+    collection: Collection = db[collection_id]
+
+    cursor = collection.find({})
+
+    for user in cursor:
+        print(f"\n{user}\n")
+
+"""Adds a new user to the user collection
 """
-def init_chat_history(client: MongoClient, user: str) -> bool:
-    if find_chat_history(client, user) == True:
+def init_user(client: MongoClient,
+              user_id: str,
+              user_name: str,
+              greeting: dict) -> None:
+    db: Database = _find_db(client)
+    collection: Collection = db[collection_id]
+    print("yep......................")
+    new_user: dict = {collection_id: user_id,
+                      user_name_column: user_name,
+                      chat_history_column: [format_entry("CHATBOT", greeting)]}
+
+    collection.insert_one(new_user)
+
+"""Return the user name of a user in the collection. Return None
+ iff the user doesn't exist in the collection.
+"""
+def get_user_name(client: MongoClient,
+                  user_id: str) -> str:
+    user = find_user(client, user_id)
+    if user is None:
+        return None
+    
+    return user[user_name_column]
+
+"""Return true iff the user in the collection has a chat history. If
+the user doesn't exist, return None"""
+def user_has_chat_history(client: MongoClient,
+                          user_id: str) -> (bool | None):
+    user: (dict | None) = find_user(client, user_id)
+    if user is None:
+        return None
+    elif not chat_history_column in user:
         return False
-
-    col = _find_db(client, user)
-    new_doc = {"user": user, col_name: []}
-    col.insert_one(new_doc)
-
-    return True
+    else:
+        return True
 
 
 """Return the list containing the chat history of this user. Return
-an empty list iff this user does not have a document in the chat
-history collection.
+None if the user doesn't exist. 
 """
-def get_chat_history(client: MongoClient, user: str) -> list:
-    if find_chat_history(client, user) == False:
-        return []
-
-    col = _find_db(client, user)
-    doc = col.find_one({"user": user})
-    return doc[col_name]
-
-
-"""Add to the chat history of this user.
-"""
-def record_chat_history(client: MongoClient, user: str, chat_history: \
-                        list) -> bool:
-    if find_chat_history(client, user) != True:
-        init_chat_history(client, user)
+def get_chat_history(
+        client: MongoClient,
+        user_id: str) -> (list | None):
+    user: (dict | None) = find_user(client, user_id)
+    if user is None:
+        return None
     
-    query = {"user": user}
-
-    db = client[db_name]
-    col = db[col_name]
-    doc = col.find_one(query)
-
-    new_history = doc[col_name]
-    new_history.extend(chat_history)
-
-    col.update_one(query, {col_name: new_history})
-
-    return True
+    return user[chat_history_column]
 
 
-"""Clear the chat history of this user. Return false iff this user
-does not have a document in the chat history collection.
+"""Update to the chat history of this user. Return false iff the
+user doesn't exist in the collection.
 """
-def clear_chat_history(client: MongoClient, user: str) -> bool:
-    if find_chat_history(client, user) == True:
-        return False
+def record_chat_history(
+        client: MongoClient,
+        user_id: str,
+        new_entry: dict) -> bool:
+    
+    database: Database = _find_db(client)
+    collection: Collection = database[collection_id]
 
-    query = {"user": user}
+    user_name: str = get_user_name(client, user_id)
+    current_chat_history: list = get_chat_history(client, user_id)
+    current_chat_history.append(new_entry)
 
-    db = client[db_name]
-    col = db[col_name]
+    query: dict = {collection_id: user_id}
+    new_user: dict = {collection_id: user_id,
+                      user_name_column: user_name,
+                      chat_history_column: current_chat_history}
 
-    col.update_one(query, {col_name: []})
+    collection.replace_one(query, new_user)
 
     return True

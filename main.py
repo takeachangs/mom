@@ -1,6 +1,5 @@
 from telegram.ext import filters, ApplicationBuilder, CommandHandler, MessageHandler
-from telegram_handler import TelegramInstance
-
+from bot.telegram_handler import TelegramInstance
 
 def main():
     telegram = TelegramInstance()
