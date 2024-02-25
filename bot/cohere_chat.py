@@ -1,5 +1,7 @@
 import cohere
 
+# If the user doesn't exist in the database, we create it
+
 class CohereChat: 
     def __init__(self, temperature, user):
         """
@@ -15,12 +17,14 @@ class CohereChat:
         """
         Get response from Cohere API
         """
+        # Fetch history from database
         response = self.co.chat(
             chat_history=self.chat_history,
             message=message,
             temperature=self.temperature,
             documents=documents
         )
+        # Update history on database
         user_message = {"user_name": self.user, "text": message}
         bot_message = {"user_name": "CHATBOT", "text": response.text}
         
