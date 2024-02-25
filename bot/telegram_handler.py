@@ -2,6 +2,7 @@ import logging
 from telegram import Update
 from telegram.ext import ContextTypes
 from cohere_chat import CohereChat
+from cohere_run import RunCohere
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -26,7 +27,7 @@ class TelegramInstance:
         await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Hi {update.message.chat.first_name}, how has your day been?")
 
     async def chat(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        response = self.cohere_bot.get_response(update.message.text)
-        message: str = response.text
 
+        message = RunCohere(self.cohere_bot, update.message.text)
+        
         await context.bot.send_message(chat_id=update.effective_chat.id, text=message)

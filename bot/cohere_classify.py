@@ -1,7 +1,7 @@
 import cohere
 from utils.constants import PREAMBLE
 
-class CohereGenerate:
+class CohereClassify:
     def __init__(self):
         """
         Initialize Cohere client
