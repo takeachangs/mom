@@ -28,10 +28,7 @@ def find_user(client: MongoClient,
     ids: Collection = db[collection_id]
     query: dict = {collection_id: user_id}
 
-    # print_all_users(client)
-
     user = ids.find_one(query)
-    print(f"\n{user}\n")
     return user
 
 """Logs all users in the collection to the console"""
@@ -52,7 +49,6 @@ def init_user(client: MongoClient,
               greeting: dict) -> None:
     db: Database = _find_db(client)
     collection: Collection = db[collection_id]
-    print("yep......................")
     new_user: dict = {collection_id: user_id,
                       user_name_column: user_name,
                       chat_history_column: [format_entry("CHATBOT", greeting)]}

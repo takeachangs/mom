@@ -3,7 +3,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from bot.cohere_chat import CohereChat
 from utils.helpers import greet_user
-from cohere_run import RunCohere
+from bot.cohere_run import RunCohere
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -29,6 +29,6 @@ class TelegramInstance:
 
     async def chat(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-        message = RunCohere(self.cohere_bot, update.message.text)
+        message = RunCohere(self.cohere_bot, update.message.text, update.effective_chat.id, context)
         
         await context.bot.send_message(chat_id=update.effective_chat.id, text=message)

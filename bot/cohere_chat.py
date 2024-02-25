@@ -22,7 +22,7 @@ class CohereChat:
             greeting = greet_user(self.user_name)
             db.init_user(self.mongo_client, self.user_id, self.user_name, greeting)
 
-    def get_response(self, message, documents =[]):
+    def get_response(self, message: str, documents=[]) -> str:
         """
         Get response from Cohere API
         """
