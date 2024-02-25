@@ -17,7 +17,7 @@
 1. Download and install Telegram.
 2. Add [MOM](https://t.me/MomNSBEbot) to your Telegram. 
 3. Python install all the required python libraries and packages found in `requirements.txt`.
-4. Run main.py.
+4. Run `main.py`.
 
 
 
