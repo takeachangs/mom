@@ -1,5 +1,5 @@
 import cohere
-
+from utils.constants import PREAMBLE
 # If the user doesn't exist in the database, we create it
 
 class CohereChat: 
@@ -20,6 +20,7 @@ class CohereChat:
         # Fetch history from database
         response = self.co.chat(
             chat_history=self.chat_history,
+            preamble_override=PREAMBLE,
             message=message,
             temperature=self.temperature,
             documents=documents
