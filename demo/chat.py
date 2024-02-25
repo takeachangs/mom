@@ -1,5 +1,5 @@
 import cohere
-co = cohere.Client("6yJnofp1XcVL54HTVCh19zBlXnGLuDm9GdAqyQJi")
+co = cohere.Client("") # Replace string with your own key
 
 initial_message = "How can I help you? Enter \"EXIT\" at any time to exit the conversation.\n"
 
