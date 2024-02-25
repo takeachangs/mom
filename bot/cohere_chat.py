@@ -48,4 +48,4 @@ class CohereChat:
         db.record_chat_history(self.mongo_client, self.user_id, user_entry)
         db.record_chat_history(self.mongo_client, self.user_id, bot_entry)
 
-        return response
+        return response.text
