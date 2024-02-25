@@ -26,3 +26,5 @@ class CohereChat:
         
         self.chat_history.append(user_message)
         self.chat_history.append(bot_message)
+
+        return response
